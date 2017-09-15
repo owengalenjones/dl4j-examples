@@ -3,6 +3,8 @@
             [clojure.core.matrix :as m])
   (:import (java.io DataInputStream)
            (java.util.zip GZIPInputStream)
+
+           (org.deeplearning4j.eval Evaluation)
            ; builders
            (org.deeplearning4j.nn.conf.NeuralNetConfiguration$Builder)
            (org.deeplearning4j.nn.conf.layers.DenseLayer$Builder)
@@ -15,6 +17,7 @@
            (org.deeplearning4j.nn.conf.distribution UniformDistribution)
 
            ; matrix
+           (org.nd4j.linalg.dataset DataSet)
            (org.nd4j.linalg.activations Activation)
            (org.nd4j.linalg.lossfunctions.LossFunctions$LossFunction))
   (:gen-class))
@@ -97,7 +100,11 @@
                       (.pretrain false)
                       (.backprop true))))
 
-(def net (doto (MultiLayerNetwork. conf) .init))
+(def net (doto (MultiLayerNetwork. conf)
+           .init
+           (.fit dataset)))
 
-(.fit net dataset)
-(.getFeatureMatrix dataset)
+(def output (.output net (.getFeatureMatrix dataset)))
+(def evalu (Evaluation. 2))
+(.eval evalu (.getLabels dataset) output)
+(println evalu)
