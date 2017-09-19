@@ -1,6 +1,5 @@
-(ns ml-test.core
-  (:require [nd4clj.matrix]
-            [clojure.core.matrix :as m])
+(ns ml-test.xor
+  (:require [jutsu.matrix.core :as jm])
   (:import (org.deeplearning4j.eval Evaluation)
 
            ; builders
@@ -20,22 +19,20 @@
            (org.nd4j.linalg.lossfunctions.LossFunctions$LossFunction))
   (:gen-class))
 
-(m/set-current-implementation :nd4j)
-
 ; [first input, second input]
-(def input (m/matrix [[0 0]
+(def input (jm/matrix [[0 0]
                       [1 0]
                       [0 1]
                       [1 1]]))
 
 ; [true, false]
-(def labels (m/matrix [[1 0]
+(def labels (jm/matrix [[1 0]
                        [0 1]
                        [0 1]
                        [1 0]]))
 
 ; .a unwraps nd4clj.matrix.clj-INDArray -> org.nd4j.linalg.cpu.nativecpu.INDArray
-(def dataset (DataSet. (.a input) (.a labels)))
+(def dataset (DataSet. input labels))
 
 ; setup network configuration
 (def list-builder (.list (-> (org.deeplearning4j.nn.conf.NeuralNetConfiguration$Builder.)
